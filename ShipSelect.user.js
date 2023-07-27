@@ -53,14 +53,15 @@
     /** @global */
     const _netquel = 'netquel';
 
+    const enterEventInit = { key: 'Enter', code: 0x001C, keyCode: 13, which: 13 };
     /** @global */
-    const enterDown = new KeyboardEvent('keydown', {'keyCode':13, 'which':13});
+    const enterDown = new KeyboardEvent('keydown', enterEventInit);
 
     /** @global */
-    const enterPress = new KeyboardEvent('keypress', {'keyCode':13, 'which':13});
+    const enterPress = new KeyboardEvent('keypress', enterEventInit);
 
     /** @global */
-    const enterUp = new KeyboardEvent('keyup', {'keyCode':13, 'which':13});
+    const enterUp = new KeyboardEvent('keyup', enterEventInit);
 
     /** @global */
     let shipCode = 'netquel1Y2?hw^b!';
