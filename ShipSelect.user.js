@@ -3,7 +3,7 @@
 // @namespace    https://github.com/HeilTec/users.cripts/tree/main
 // @updateURL    https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
 // @downloadURL  https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
-// @version      0.3
+// @version      0.4
 // @description  Ship manager for Netquel
 // @author       HeilTec
 // @match        https://netquel.com/
@@ -33,7 +33,16 @@
         `/import netquel1h5vl>o5!TH9Phrtr27Vw>KnJLo@F(b!=0;JZaLVwZn@=f=elM0jpZ!29PF0Eo$Hoc4tB0vcH6ez\`TF_#X}Y(WcJ?eIn!UZQ13TB@c4j&(0R`,
         `/import netquel1{f}OMb_8RdC)P5rdeuAMMVxcaL!WvgNv>UMO}Wg2x=dZB)?!+V<u8Bv%VYo`,
         `/import netquel1{r~Yl8^+ctRaI5*QgXY>EppPOVoSxAy40m^k<+TAs!Qdi)>Q%`,
-    ]
+    ];
+
+    /** @global */
+    const debug = true;
+
+    const orgConsoleDebug = Console.debug;
+
+    Console.debug = function myDebug() {
+        if (debug) orgConsoleDebug(...arguments);
+    }
 
     /** @global */
     const _matchChatBox = 'div.input[name="message"]';
@@ -188,7 +197,7 @@
     /**
      *
      * @param {?Function} cb callback
-     * @returns
+     * @returns undefined
      */
     function catchShipCodeFromServerAnswer(cb){
         const foundChatBox = unsafeWindow.document.getElementById('chat');
@@ -213,7 +222,8 @@
     function installKeyboardHook() {
         unsafeWindow.document.body.addEventListener('keyup',
             (ev) => {
-                if (ev.key === 'shift') myShiftKey = false;
+                console.debug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: {myShiftKey} MyControlKey {MyControlKey}`);
+                if (ev.key === 'Shift') myShiftKey = false;
                 if (ev.key === 'Control') myControlKey = false;
             }
         );
@@ -224,7 +234,8 @@
              * @param {KeyboardEvent} ev Event
              */
             (ev) => {
-                if (ev.key === 'shift') myShiftKey = false;
+                console.debug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: {myShiftKey} MyControlKey {MyControlKey}`);
+                if (ev.key === 'Shift') myShiftKey = false;
                 if (ev.key === 'Control') myControlKey = false;
 
                 if (ev.code.indexOf('Numpad') === 0) {
