@@ -1,0 +1,10 @@
+"Gauss Destroyer 1.0"
+
+- Front: ALL gauss rifle (mix lenght) + 2 long magnet
+- Sides: small lasers and all drills (defensive mode)
+- Rear: 3 layers (small missiles, lasers, and drills)
+-mid-slow ship, very destructive from distance. 
+- For better defense should never stop.
+
+/import netquel1#fKLN7a2bW1_nYf;jl^;T2<A*FI9Klb=N|FR#jEkVuk**s=E4RajAV+t-}1%SHw@f(trL+MMq4mSdm}qYq9DRf~!SB^r>R*!&EW%eQw6xzR!)jySux)ySux)ySux)ySuwu(-5_oDyE95V*cIT-QC^Y-QC^Y-QC^Y-QC?2qBlf~gy0F$>-B`__32`&nENnQY@f84@=b4g)0^J(rZ>ImO>cjN40WoeOT|<%-#vBr)ZJ5ePu)Fr_tf1}cTe3t<*!v$Rn_ssbS^StA9A%;b2VSD*J`enf0EzmB}x-fWB
+Cost: a lot (i think 25.000$-30.000$)
