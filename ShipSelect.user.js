@@ -38,14 +38,10 @@
     /** @global */
     const debug = true;
 
-    const orgConsoleDebug = Console.debug;
-
-    Console.debug = function myDebug() {
-        if (debug) orgConsoleDebug(...arguments);
+    function myDebug() {
+        if (debug) console.debug(...arguments);
     }
 
-    /** @global */
-    const _matchChatBox = 'div.input[name="message"]';
     console.info('userscript loaded');
 
     /** @global */
@@ -122,7 +118,7 @@
             } else {
                 enterShips.style.display = 'none';
                 shipList = enterShips.textContent.split(_newLine);
-                console.debug(shipList);
+                myDebug(shipList);
             }
         });
 
@@ -186,6 +182,7 @@
      * @returns {String}
      */
     function readCommandString() {
+        /** @type {HTMLElement} foundChatBox */
         const foundChatBox = unsafeWindow.document.getElementById('chat');
         const chatInput = foundChatBox?.querySelector('input[name=message]');
         if (chatInput !== undefined) {
@@ -222,7 +219,7 @@
     function installKeyboardHook() {
         unsafeWindow.document.body.addEventListener('keyup',
             (ev) => {
-                console.debug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: {myShiftKey} MyControlKey {MyControlKey}`);
+                myDebug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey}`);
                 if (ev.key === 'Shift') myShiftKey = false;
                 if (ev.key === 'Control') myControlKey = false;
             }
@@ -234,9 +231,9 @@
              * @param {KeyboardEvent} ev Event
              */
             (ev) => {
-                console.debug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: {myShiftKey} MyControlKey {MyControlKey}`);
-                if (ev.key === 'Shift') myShiftKey = false;
-                if (ev.key === 'Control') myControlKey = false;
+                myDebug('keydown: ', ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey}`);
+                if (ev.key === 'Shift') myShiftKey = true;
+                if (ev.key === 'Control') myControlKey = true;
 
                 if (ev.code.indexOf('Numpad') === 0) {
 
