@@ -83,6 +83,9 @@
     /** @global */
     let myControlKey = false;
 
+    /** @global */
+    let myAltKey = false;
+
     createLoadButton();
     createSaveButton();
     installKeyboardHook();
@@ -106,7 +109,9 @@
     /** Creates a button to edit all stored ship codes */
     function createSaveButton() {
         const _newLine = '\r\n';
+        /** @type {HTMLDivElement} */
         const saveShipDiv = unsafeWindow.document.createElement('div');
+        /** @type {HTMLLabelElement} */
         const saveShipButton = unsafeWindow.document.createElement('label');
         const enterShips = createShipsTextarea();
 
@@ -129,6 +134,7 @@
         unsafeWindow.document.body.appendChild(saveShipDiv);
 
         function createShipsTextarea() {
+            /** @type {HTMLTextAreaElement} */
             const enterShips = unsafeWindow.document.createElement('textarea');
             enterShips.style.position = 'relative';
             enterShips.style.left = '-160px';
@@ -220,9 +226,10 @@
     function installKeyboardHook() {
         unsafeWindow.document.body.addEventListener('keyup',
             (ev) => {
-                myDebug('keyup: ', ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey}`);
+                myDebug('keyup: ', Date.now(), ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey} MyAltKey ${myAltKey}`);
                 if (ev.key === 'Shift') myShiftKey = false;
                 if (ev.key === 'Control') myControlKey = false;
+                if (ev.key === 'Alt') myAltKey = false;
             }
         );
 
@@ -232,16 +239,17 @@
              * @param {KeyboardEvent} ev Event
              */
             (ev) => {
-                myDebug('keydown: ', ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey}`);
+                myDebug('keydown: ', Date.now(), ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey} MyAltKey ${myAltKey}`);
                 if (ev.key === 'Shift') myShiftKey = true;
                 if (ev.key === 'Control') myControlKey = true;
+                if (ev.key === 'Alt') myAltKey = true;
 
                 if (ev.code.indexOf('Numpad') === 0) {
 
                     const numpadID = (ev.code.substring(6, 7));
                     selectedShipIndex = parseInt(numpadID);
                     if (!isNaN(selectedShipIndex)) { // It is a number
-                        if (myShiftKey) {
+                        if (myAltKey) {
                             const commandString = readCommandString();
                             if (commandString.indexOf(_netquel) >= 0) {
                                 shipList[selectedShipIndex] = commandString;
@@ -252,7 +260,7 @@
                         }
                     } else { // It is a special char
                         switch (numpadID) {
-                            case '/': // UpdateCurrent ship
+                            case 'D': // (NumpadDivide) UpdateCurrent ship
                                 pasteCommandString(_export);
                                 if (activeCatcher !== 0) clearTimeout(activeCatcher);
                                 activeCatcher = setTimeout(catchShipCodeFromServerAnswer, 36, _ => {
@@ -260,7 +268,7 @@
                                 });
                                 break;
 
-                            case '*':
+                            case 'M': // (NumpadMultiply) 
                                 PasteShip(shipCode);
                                 break;
 
