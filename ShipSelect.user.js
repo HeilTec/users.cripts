@@ -3,12 +3,14 @@
 // @namespace    https://github.com/HeilTec/users.cripts/tree/main
 // @updateURL    https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
 // @downloadURL  https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
-// @version      0.4
+// @version      0.5
 // @description  Ship manager for Netquel
 // @author       HeilTec
 // @match        https://netquel.com/
 // @sandbox      JavaScript
 // @grant        unsafeWindow
+// @grant        GM_setValue
+// @grant        GM_getValue
 // ==/UserScript==
 
 (function() {
@@ -53,7 +55,7 @@
     /** @global */
     const _netquel = 'netquel';
 
-    const enterEventInit = { key: 'Enter', code: 0x001C, keyCode: 13, which: 13 };
+    const enterEventInit = { , key: 'Enter', code: 0x001C, keyCode: 13, which: 13 };
     /** @global */
     const enterDown = new KeyboardEvent('keydown', enterEventInit);
 
@@ -86,6 +88,15 @@
     /** @global */
     let myAltKey = false;
 
+    const _shipListKey = 'shipList';
+    /** @global */
+    let storedShips = GM_getValue(_shipListKey);
+
+    if (Array.isArray(storedShips) && storedShips.length === 10) {
+        shipList = storedShips;
+    } else {
+        GM_setValue(_shipListKey, shipList);
+    }
     createLoadButton();
     createSaveButton();
     installKeyboardHook();
@@ -108,43 +119,80 @@
 
     /** Creates a button to edit all stored ship codes */
     function createSaveButton() {
-        const _newLine = '\r\n';
+        const _newLine = '\n';
+
         /** @type {HTMLDivElement} */
         const saveShipDiv = unsafeWindow.document.createElement('div');
+
         /** @type {HTMLLabelElement} */
         const saveShipButton = unsafeWindow.document.createElement('label');
+
         const enterShips = createShipsTextarea();
+
+        /** @type {HTMLDivElement} */
+        const container = unsafeWindow.document.createElement('div');
+        container.style.position = 'relative';
+        container.style.left = '-160px';
+        container.style.display = 'none';
+        container.appendChild(enterShips);
+
+        container.appendChild(unsafeWindow.document.createElement('br'));
+
+        /** @type {HTMLButtonElement} */
+        const cancelButton = unsafeWindow.document.createElement('button');
+        cancelButton.innerText = 'Cancel';
+        cancelButton.addEventListener('click', () => {
+            container.style.display = 'none';
+        });
+        container.appendChild(cancelButton);
+
+        /** @type {HTMLButtonElement} */
+        const saveButton = unsafeWindow.document.createElement('button');
+        saveButton.innerText = 'Save';
+        saveButton.addEventListener('click', () => {
+            shipList = enterShips.value.split(_newLine);
+            GM_setValue(_shipListKey, shipList);
+            container.style.display = 'none';
+        });
+        container.appendChild(saveButton);
+
+        /** @type {HTMLButtonElement} */
+        const restoreButton = unsafeWindow.document.createElement('button');
+        restoreButton.innerText = 'Restore'
+        restoreButton.addEventListener('click', () => {
+            shipList = GM_getValue(_shipListKey);
+            enterShips.value = shipList.join(_newLine);
+        });
+        container.appendChild(restoreButton);
 
         saveShipButton.innerText = 'SaveShip';
         saveShipButton.addEventListener('click', _ => {
-            if (enterShips.style.display === 'none') {
-                enterShips.style.display = 'block';
-                enterShips.textContent = shipList.join(_newLine);
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                enterShips.value = shipList.join(_newLine);
                 enterShips.focus();
             } else {
-                enterShips.style.display = 'none';
-                shipList = enterShips.textContent.split(_newLine);
+                container.style.display = 'none';
+                shipList = enterShips.value.split(_newLine);
                 myDebug(shipList);
             }
         });
 
         saveShipDiv.style = 'position: absolute; top: 20px; left: 70%; z-index: 1000;';
         saveShipDiv.appendChild(saveShipButton);
-        saveShipDiv.appendChild(enterShips);
+        saveShipDiv.appendChild(container);
         unsafeWindow.document.body.appendChild(saveShipDiv);
 
         function createShipsTextarea() {
             /** @type {HTMLTextAreaElement} */
-            const enterShips = unsafeWindow.document.createElement('textarea');
-            enterShips.style.position = 'relative';
-            enterShips.style.left = '-160px';
-            enterShips.style.color = 'white';
-            enterShips.style.backgroundColor = 'black';
-            enterShips.style.display = 'none';
-            enterShips.rows = 11;
-            enterShips.cols = 50;
-            enterShips.classList.add('stylist-style-18');
-            return enterShips;
+            const shipsTextarea = unsafeWindow.document.createElement('textarea');
+
+            shipsTextarea.style.color = 'white';
+            shipsTextarea.style.backgroundColor = 'black';
+            shipsTextarea.rows = 11;
+            shipsTextarea.cols = 50;
+            // shipsTextarea.classList.add('stylist-style-18');
+            return shipsTextarea;
         }
     }
 
