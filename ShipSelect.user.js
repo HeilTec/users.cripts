@@ -3,7 +3,7 @@
 // @namespace    https://github.com/HeilTec/users.cripts/tree/main
 // @updateURL    https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
 // @downloadURL  https://github.com/HeilTec/users.cripts/raw/main/Netquel/ShipSelect.user.js
-// @version      0.5
+// @version      0.6
 // @description  Ship manager for Netquel
 // @author       HeilTec
 // @match        https://netquel.com/
@@ -54,8 +54,8 @@
 
     /** @global */
     const _netquel = 'netquel';
-
-    const enterEventInit = { , key: 'Enter', code: 0x001C, keyCode: 13, which: 13 };
+    /** @type  {KeyboardEventInit}*/
+    const enterEventInit = {key: 'Enter', code: 'Enter'};
     /** @global */
     const enterDown = new KeyboardEvent('keydown', enterEventInit);
 
@@ -97,7 +97,9 @@
     } else {
         GM_setValue(_shipListKey, shipList);
     }
-    createLoadButton();
+
+    /** @global */
+    const LoadLabel = createLoadButton();
     createSaveButton();
     installKeyboardHook();
 
@@ -107,7 +109,7 @@
         loadShipDiv.style = 'position: absolute; top: 20px; left: 30%;; z-index: 1000';
 
         const loadShip = unsafeWindow.document.createElement('label');
-        loadShip.innerText = 'LoadShip';
+        loadShip.innerText = `LoadShip ${selectedShipIndex}`;
         loadShipDiv.appendChild(loadShip);
 
         unsafeWindow.document.body.appendChild(loadShipDiv);
@@ -115,6 +117,7 @@
         loadShipDiv.addEventListener('click', _ => {
             PasteShip(shipCode);
         });
+        return loadShip;
     }
 
     /** Creates a button to edit all stored ship codes */
@@ -198,18 +201,18 @@
 
     function HitEnterTwice() {
         setTimeout(() => {
-            unsafeWindow.document.body.dispatchEvent(enterDown);
-            unsafeWindow.document.body.dispatchEvent(enterPress);
+            document.body.dispatchEvent(enterDown);
+            document.body.dispatchEvent(enterPress);
         }, 0);
         setTimeout(() => {
-            unsafeWindow.document.body.dispatchEvent(enterUp);
+            document.body.dispatchEvent(enterUp);
         }, 17);
         setTimeout(() => {
-            unsafeWindow.document.body.dispatchEvent(enterDown);
-            unsafeWindow.document.body.dispatchEvent(enterPress);
+            document.body.dispatchEvent(enterDown);
+            document.body.dispatchEvent(enterPress);
         }, 34);
         setTimeout(() => {
-            unsafeWindow.document.dispatchEvent(enterUp);
+            document.dispatchEvent(enterUp);
         }, 51);
     }
 
@@ -253,7 +256,8 @@
      */
     function catchShipCodeFromServerAnswer(cb){
         const foundChatBox = unsafeWindow.document.getElementById('chat');
-        const paragraphs = foundChatBox.querySelectorAll('p');
+        const paragraphs = foundChatBox?.querySelectorAll('p');
+        if (paragraphs === undefined) return;
         let pIndex = paragraphs.length - 1;
         while (pIndex >= 0) {
             const paragraph = paragraphs[pIndex];
@@ -275,9 +279,9 @@
         unsafeWindow.document.body.addEventListener('keyup',
             (ev) => {
                 myDebug('keyup: ', Date.now(), ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey} MyAltKey ${myAltKey}`);
-                if (ev.key === 'Shift') myShiftKey = false;
-                if (ev.key === 'Control') myControlKey = false;
-                if (ev.key === 'Alt') myAltKey = false;
+                if (ev.code.slice(0, 5) === 'Shift') myShiftKey = false;
+                if (ev.code.slice(0, 7) === 'Control') myControlKey = false;
+                if (ev.code.slice(0, 3) === 'Alt') myAltKey = false;
             }
         );
 
@@ -288,15 +292,16 @@
              */
             (ev) => {
                 myDebug('keydown: ', Date.now(), ev.key, ev.code, '\n', `MyShiftKey: ${myShiftKey} MyControlKey ${myControlKey} MyAltKey ${myAltKey}`);
-                if (ev.key === 'Shift') myShiftKey = true;
-                if (ev.key === 'Control') myControlKey = true;
-                if (ev.key === 'Alt') myAltKey = true;
+                if (ev.code.slice(0, 5) === 'Shift') myShiftKey = true;
+                if (ev.code.slice(0, 7) === 'Control') myControlKey = true;
+                if (ev.code.slice(0, 3) === 'Alt') myAltKey = true;
 
                 if (ev.code.indexOf('Numpad') === 0) {
 
                     const numpadID = (ev.code.substring(6, 7));
                     selectedShipIndex = parseInt(numpadID);
                     if (!isNaN(selectedShipIndex)) { // It is a number
+                        LoadLabel.innerText = `LoadShip ${selectedShipIndex}`;
                         if (myAltKey) {
                             const commandString = readCommandString();
                             if (commandString.indexOf(_netquel) >= 0) {
